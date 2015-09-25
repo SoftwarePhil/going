@@ -1,16 +1,17 @@
 package main
+
 import (
-"fmt"
-"time"
-"math/rand"
-"sync"
-"strconv"
+	"fmt"
+	"math/rand"
+	"strconv"
+	"sync"
+	"time"
 )
+
 func main() {
-	emptyMap := map[int]Point{}
 	var wg sync.WaitGroup
-	a := Worker{Point{1,1},"a", emptyMap}
-	b := Worker{Point{5,5},"b", emptyMap}
+	a := worker{point{1, 1, time.Now().String()}, "a", map[string]point{}}
+	b := worker{point{5, 5, time.Now().String()}, "b", map[string]point{}}
 	wg.Add(2)
 	go a.move(&wg)
 	go b.move(&wg)
@@ -18,48 +19,54 @@ func main() {
 	fmt.Println(a.constructPath())
 }
 
-type Worker struct {
-	Point
+type worker struct {
+	point
 	name string
-	m map[int]Point
-	}
+	m    map[string]point
+}
 
-type Point struct {
-	x int
-	y int
-	}
-	
+type point struct {
+	x    int
+	y    int
+	time string
+}
 
-func (w *Worker) move(wg *sync.WaitGroup) {
+func (w *worker) move(wg *sync.WaitGroup) {
 	//for i := 0; i < 100; i++{
 	defer wg.Done()
-	for i := 0; i < 50; i++{
-	w.x = w.x + selectValue()
-	w.y = w.y + selectValue()
-	place := ("x : " + strconv.Itoa(w.x) +" "+ "y : " + strconv.Itoa(w.y) + " " + w.name + " " + time.Now().String())
-	w.addPlace(i)
-	fmt.Println(place)
-	time.Sleep(500 * time.Millisecond)
+	for i := 0; i < 5; i++ {
+		w.x = w.x + selectValue()
+		w.y = w.y + selectValue()
+		strPlace := ("x : " + strconv.Itoa(w.x) + " " + "y : " + strconv.Itoa(w.y) + " " + w.name + " " + time.Now().String())
+		place := strconv.Itoa(w.x) + " " + strconv.Itoa(w.y)
+		w.addPlace(place)
+		fmt.Println(strPlace)
+		time.Sleep(500 * time.Millisecond)
 	}
 }
 
-func (w*Worker) addPlace(i int){
-		w.m[i] = w.Point
+func (w *worker) addPlace(s string) {
+	w.m[s] = w.point
+}
+
+func (w *point) getLocation() string {
+	return "(" + strconv.Itoa(w.x) + "," + strconv.Itoa(w.y) + ")"
+}
+
+func (w *worker) constructPath() string {
+	s := " "
+	f := s
+	for key, value := range w.m {
+		f = key
+		s = s + value.getLocation()
 	}
-	
-func (w*Worker) constructPath() string{
-	places := ""
-	for i := 0; i < 50; i++{
-		places = places + " " +"(" +strconv.Itoa(w.m[i].x) + " " + strconv.Itoa(w.m[i].y) + ")"
-		}
-		
-		return places
+	return s + f
+}
+
+func selectValue() int {
+	if rand.Intn(100) > 50 {
+		return rand.Intn(2) * (-1)
 	}
 
-func selectValue() int{
-		if (rand.Intn(100) > 50) {
-			return rand.Intn(2)*(-1)
-		}
-		
-		return rand.Intn(2)
-} 
+	return rand.Intn(2)
+}
