@@ -16,7 +16,9 @@ func main() {
 	go a.move(&wg)
 	go b.move(&wg)
 	wg.Wait()
+
 	fmt.Println(a.constructPath())
+	fmt.Println(b.constructPath())
 }
 
 type worker struct {
@@ -26,9 +28,9 @@ type worker struct {
 }
 
 type point struct {
-	x    int
-	y    int
-	time string
+	x     int
+	y     int
+	aTime string
 }
 
 func (w *worker) move(wg *sync.WaitGroup) {
@@ -37,15 +39,17 @@ func (w *worker) move(wg *sync.WaitGroup) {
 	for i := 0; i < 5; i++ {
 		w.x = w.x + selectValue()
 		w.y = w.y + selectValue()
-		strPlace := ("x : " + strconv.Itoa(w.x) + " " + "y : " + strconv.Itoa(w.y) + " " + w.name + " " + time.Now().String())
+		aTime := time.Now().String()
+		strPlace := ("x : " + strconv.Itoa(w.x) + " " + "y : " + strconv.Itoa(w.y) + " " + w.name + " " + aTime)
 		place := strconv.Itoa(w.x) + " " + strconv.Itoa(w.y)
-		w.addPlace(place)
+		w.addPlace(place, aTime)
 		fmt.Println(strPlace)
 		time.Sleep(500 * time.Millisecond)
 	}
 }
 
-func (w *worker) addPlace(s string) {
+func (w *worker) addPlace(s, t string) {
+	w.aTime = t
 	w.m[s] = w.point
 }
 
@@ -60,6 +64,7 @@ func (w *worker) constructPath() string {
 		f = key
 		s = s + value.getLocation()
 	}
+	f = ""
 	return s + f
 }
 
