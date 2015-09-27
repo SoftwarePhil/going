@@ -10,6 +10,7 @@ import (
 
 func main() {
 	var wg sync.WaitGroup
+	rand.Seed(time.Now().UnixNano())
 	a := worker{point{1, 1, time.Now().String()}, "a", map[string]point{}}
 	b := worker{point{5, 5, time.Now().String()}, "b", map[string]point{}}
 	wg.Add(2)
@@ -36,9 +37,13 @@ type point struct {
 func (w *worker) move(wg *sync.WaitGroup) {
 	//for i := 0; i < 100; i++{
 	defer wg.Done()
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 6; i++ {
 		w.x = w.x + selectValue()
 		w.y = w.y + selectValue()
+		if _, ok := w.m[strconv.Itoa(w.x)+" "+strconv.Itoa(w.y)]; ok {
+			w.x = w.x + selectValue()
+			w.y = w.y + selectValue()
+		}
 		aTime := time.Now().String()
 		strPlace := ("x : " + strconv.Itoa(w.x) + " " + "y : " + strconv.Itoa(w.y) + " " + w.name + " " + aTime)
 		place := strconv.Itoa(w.x) + " " + strconv.Itoa(w.y)
