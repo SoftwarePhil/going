@@ -8,7 +8,6 @@ import (
 	"time"
 )
 
-
 func Init() *sync.WaitGroup {
 	var wg sync.WaitGroup
 	rand.Seed(time.Now().UnixNano())
@@ -27,7 +26,7 @@ type Point struct {
 	ATime string
 }
 
-func (w *Worker) StartMoving (wg *sync.WaitGroup){
+func (w *Worker) StartMoving(wg *sync.WaitGroup) {
 	wg.Add(1)
 	go w.move(wg)
 	wg.Wait()
@@ -37,8 +36,8 @@ func (w *Worker) move(wg *sync.WaitGroup) {
 	//for i := 0; i < 100; i++{
 	defer wg.Done()
 	for i := 0; i < 6; i++ {
-		
-		if(!w.checkIfVisited()){
+
+		if !w.checkIfVisited() {
 			w.X = w.X + selectValue()
 			w.Y = w.Y + selectValue()
 			w.checkIfVisited()
@@ -52,11 +51,11 @@ func (w *Worker) move(wg *sync.WaitGroup) {
 	}
 }
 
-func (w * Worker) checkIfVisited() bool{
+func (w *Worker) checkIfVisited() bool {
 	if _, ok := w.M[strconv.Itoa(w.X)+" "+strconv.Itoa(w.Y)]; ok {
-			return false
-		}
-		return true
+		return false
+	}
+	return true
 }
 func (w *Worker) addPlace(s, t string) {
 	w.ATime = t
@@ -85,6 +84,7 @@ func selectValue() int {
 
 	return rand.Intn(2)
 }
+
 /*
 var wg sync.WaitGroup
 	rand.Seed(time.Now().UnixNano())
