@@ -1,13 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strconv"
+)
 
-type ConnectionMap map[Connection]*Dot
+type ConnectionMap map[*Dot]*Connection
 
 type Dot struct {
 	DotID       string
-	Connections []string
-	M           ConnectionMap
+	Connections []ConnectionInfo
+	Connection
+	M ConnectionMap
 }
 
 type Connection struct {
@@ -16,13 +20,25 @@ type Connection struct {
 	JointID  string
 }
 
+type ConnectionInfo struct {
+	connectionID  string
+	ConnectionDot string
+}
+
 func main() {
-	aDot := createEmptyDot("my dot")
-	aDot2 := createEmptyDot("my dot2")
+	aDot := createEmptyDot("myDot")
+	aDot2 := createEmptyDot("myDot2")
+	aDot3 := createEmptyDot("myDot3")
 
 	addConnection(aDot, aDot2, 5, "c1")
-	aDot.getConnection("c1")
-	fmt.Printf("%d", aDot.getConnection("c1").Distance)
+	addConnection(aDot3, aDot, 2, "c2")
+	addConnection(aDot2, aDot3, 3, "c3")
+
+	fmt.Printf("%d", getConnection(aDot, aDot.Connections[0].connectionID).Distance)
+
+	aDot.PrintDot()
+	aDot2.PrintDot()
+	aDot3.PrintDot()
 }
 
 func createEmptyDot(s string) *Dot {
@@ -35,23 +51,29 @@ func createEmptyDot(s string) *Dot {
 func addConnection(d, other *Dot, distance int, id string) {
 
 	a := [2]*Dot{d, other}
-	c := Connection{a, distance, id}
-	d.M[c] = other
-	other.M[c] = d
+	c := &Connection{a, distance, id}
+	d.M[other] = c
+	other.M[d] = c
 
-	d.Connections = append(d.Connections, other.DotID)
-	other.Connections = append(other.Connections, d.DotID)
+	d.Connections = append(d.Connections, ConnectionInfo{id, other.DotID})
+	other.Connections = append(other.Connections, ConnectionInfo{id, d.DotID})
 }
 
-func (d *Dot) getConnection(id string) *Connection {
-	for key := range d.M {
-		if key.JointID == id {
-			return &key
+func getConnection(d *Dot, id string) *Connection {
+	for _, value := range d.M {
+		if value.JointID == id {
+			return value
 		}
 	}
-	return nil
+	a := new(Connection)
+	a.JointID = "nil"
+	return a
 }
 
 func (d *Dot) PrintDot() {
-	fmt.Print(d.DotID)
+	s := ""
+	for x := range d.Connections {
+		s = s + "\n	Name: " + d.Connections[x].ConnectionDot + " Distance: " + strconv.Itoa(getConnection(d, d.Connections[x].connectionID).Distance)
+	}
+	fmt.Println("\nDot id: " + d.DotID + "\nConnections: " + s)
 }
