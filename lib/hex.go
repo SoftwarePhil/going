@@ -26,12 +26,8 @@ type ConnectionInfo struct {
 }
 
 func main() {
-		a := MakeHex(3, 50)
-
-		for i := range a{
-			fmt.Println(a[i].PrintDot()
-		}
-
+	a := MakeHex(3, 50)
+	fmt.Println(a[0].Connections[0].connectionID)
 }
 
 func createEmptyDot(s string) *Dot {
@@ -85,23 +81,26 @@ func getDot(d *Dot, id string) *Dot {
 }
 
 func MakeHex(distance, size int) []*Dot {
-	var dots [size]*Dot
+	dots := make([]*Dot, size)
 	for count := range dots {
-		dots[count] = createEmptyDot("i" + strconv.Itoa(count))
+		dots[count] = createEmptyDot("dot" + strconv.Itoa(count))
 	}
-	for count := range Dots{
+	for count := range dots {
 		dots[count] = fillDot(count, distance, dots)
 	}
+	return dots
 }
 
 func fillDot(i, distance int, dots []*Dot) *Dot {
-	for !dot.full {
-		count := 1
-		dots[i].addConnection(dots[i+count], distance, "c"+strconv.Itoa(i)+":"+strconv.Itoa(count))
+	count := 1
+	fmt.Println(strconv.Itoa(i) + "func start")
+	for !dots[i].full && (count+i*2) < len(dots) {
+		dots[i].addConnection(dots[i+count*2], distance, "c"+strconv.Itoa(i)+":"+strconv.Itoa(count))
+		fmt.Println(strconv.Itoa(i + count))
 		count++
 	}
+	return dots[i]
 }
-
 
 func (d *Dot) PrintDot() {
 	s := ""
